@@ -10,4 +10,6 @@ interface AirportDao {
     fun getFilteredAirports(query: String): Flow<List<Airport>>
     @Query("SELECT * from airport WHERE iata_code != :iata_code ORDER BY passengers DESC")
     fun getAllAirportsExcept(iata_code: String): Flow<List<Airport>>
+    @Query("SELECT * from airport WHERE iata_code = :iata_code")
+    fun getAirportByCode(iata_code: String): Flow<Airport>
 }

@@ -46,12 +46,15 @@ fun AirportSearchScreen(
     val airportSearchUiState = viewModel.airportSearchUiState.collectAsState().value
     var query = viewModel.currentAirportName
 
-    FlightSearchBar(
-        query = query,
-        onQueryChange = { viewModel.changeAirportName(it) },
-        searchResults = airportSearchUiState.airportList,
-        onAirportClicked = onAirportClicked
-    )
+    Column {
+        FlightSearchBar(
+            query = query,
+            onQueryChange = { viewModel.changeAirportName(it) },
+            searchResults = airportSearchUiState.airportList,
+            onAirportClicked = onAirportClicked
+        )
+        FavoritesContent()
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,7 +71,7 @@ fun FlightSearchBar(
 
     Box(
         modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .semantics { isTraversalGroup = true }
     ) {
         SearchBar(

@@ -2,6 +2,7 @@ package com.example.androidlab5_flightsdb.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -13,36 +14,37 @@ import com.example.androidlab5_flightsdb.ui.AirportSearchViewModel
 import com.example.androidlab5_flightsdb.ui.AppViewModelProvider
 import com.example.androidlab5_flightsdb.ui.FlightSearchScreen
 import com.example.androidlab5_flightsdb.ui.FlightSearchViewModel
+import kotlinx.serialization.Serializable
+
+@Serializable
+object AirportSearchScreenDestination
+
+@Serializable
+data class FlightSearchScreenDestination(
+    val iata_code: String
+)
 
 @Composable
 fun FlightSearchNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    airportSearchViewModel: AirportSearchViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    flightSearchViewModel: FlightSearchViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     NavHost(
         navController = navController,
-        startDestination = "airportSearchScreen"
+        startDestination = AirportSearchScreenDestination
     ) {
-        composable(route = "airportSearchScreen") {
+        composable<AirportSearchScreenDestination> {
             AirportSearchScreen(
-                viewModel = airportSearchViewModel,
                 onAirportClicked = { selectedAirport ->
                     val iata_code = selectedAirport.iata_code
-                    navController.navigate("flightSearchScreen/$iata_code")
-                }
+                    navController.navigate(FlightSearchScreenDestination(iata_code))
+                },
+                modifier = modifier
             )
         }
-        composable(
-            route = "flightSearchScreen/iata_code",
-            arguments = listOf(navArgument("iata_code") {
-                type = NavType.StringType
-            })
-        ) {
-            FlightSearchScreen(
-                viewModel = flightSearchViewModel
-            )
+        composable<FlightSearchScreenDestination> { backStackEntry ->
+            FlightSearchScreen(modifier = modifier)
         }
     }
 }
+

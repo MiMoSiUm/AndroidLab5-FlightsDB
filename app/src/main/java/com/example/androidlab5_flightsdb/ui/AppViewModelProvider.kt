@@ -12,12 +12,20 @@ object AppViewModelProvider {
         initializer {
             FlightSearchViewModel(
                 savedInstanceHandle = this.createSavedStateHandle(),
-                airportRepository = flightSearchApplication().container.airportRepository
+                airportRepository = flightSearchApplication().container.airportRepository,
+                favoriteRepository = flightSearchApplication().container.favoriteRepository
             )
         }
 
         initializer {
             AirportSearchViewModel(flightSearchApplication().container.airportRepository)
+        }
+
+        initializer {
+            FavoritesViewModel(
+                flightSearchApplication().container.airportRepository,
+                flightSearchApplication().container.favoriteRepository
+            )
         }
     }
 }
