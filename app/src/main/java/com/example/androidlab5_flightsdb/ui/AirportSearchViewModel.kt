@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidlab5_flightsdb.data.Airport
 import com.example.androidlab5_flightsdb.data.AirportRepository
+import com.example.androidlab5_flightsdb.data.UserPreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,12 +15,21 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class AirportSearchViewModel(private val airportRepository: AirportRepository) : ViewModel() {
-    var currentAirportName by mutableStateOf("")
+class AirportSearchViewModel(
+    private val airportRepository: AirportRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
+) : ViewModel() {
+    var currentAirportName: StateFlow<String> =
+        userPreferencesRepository.searchQuery.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = ""
+        )
 
     var airportSearchUiState: StateFlow<AirportSearchUiState> =
-        airportRepository.getAllAirportsStream(currentAirportName).map { AirportSearchUiState(it) }
+        airportRepository.getAllAirportsStream(currentAirportName.value).map { AirportSearchUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -27,14 +37,16 @@ class AirportSearchViewModel(private val airportRepository: AirportRepository) :
             )
 
     fun changeAirportName(airportName: String) {
-        currentAirportName = airportName
-        airportSearchUiState =
-            airportRepository.getAllAirportsStream(currentAirportName).map { AirportSearchUiState(it) }
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                    initialValue = AirportSearchUiState()
-                )
+        viewModelScope.launch {
+            userPreferencesRepository.saveQueryPreference(airportName)
+            airportSearchUiState =
+                airportRepository.getAllAirportsStream(currentAirportName.value).map { AirportSearchUiState(it) }
+                    .stateIn(
+                        scope = viewModelScope,
+                        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                        initialValue = AirportSearchUiState()
+                    )
+        }
     }
 
     companion object {
