@@ -20,7 +20,7 @@ object AppViewModelProvider {
         initializer {
             AirportSearchViewModel(
                 flightSearchApplication().container.airportRepository,
-                flightSearchApplication().userPreferencesRepository
+                flightSearchApplication().container.userPreferencesRepository
             )
         }
 
