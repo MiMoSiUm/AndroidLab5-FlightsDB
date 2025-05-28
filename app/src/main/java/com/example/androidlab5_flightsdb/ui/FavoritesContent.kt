@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidlab5_flightsdb.data.Airport
@@ -36,10 +37,8 @@ fun FavoritesContent(
 
     LazyColumn(modifier = modifier) {
         items(items = favoritesUiState.favoritesList, key = { it.id }) { favorite ->
-            val airports = viewModel.favoriteToAirports(favorite)
             FavoriteCard(
-                selectedAirport = airports[0].collectAsState().value,
-                currentAirport = airports[1].collectAsState().value,
+                favorite = favorite,
                 onDeselect = { viewModel.deleteFavorite(favorite) }
             )
         }
@@ -49,8 +48,7 @@ fun FavoritesContent(
 @Composable
 fun FavoriteCard(
     modifier: Modifier = Modifier,
-    selectedAirport: Airport,
-    currentAirport: Airport,
+    favorite: Favorite,
     onDeselect: () -> Unit
 ) {
     Card(
@@ -68,13 +66,13 @@ fun FavoriteCard(
                 modifier = Modifier.weight(5f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                AirportCardInfoItem(
+                FavoriteCardInfoItem(
                     state = "DEPART",
-                    airport = selectedAirport
+                    iata_code = favorite.departure_code
                 )
-                AirportCardInfoItem(
+                FavoriteCardInfoItem(
                     state = "ARRIVE",
-                    airport = currentAirport
+                    iata_code = favorite.destination_code
                 )
             }
             IconButton(
@@ -88,3 +86,18 @@ fun FavoriteCard(
         }
     }
 }
+
+@Composable
+fun FavoriteCardInfoItem(
+    state: String,
+    iata_code: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(text = state, fontWeight = FontWeight.Light)
+        Text(text = iata_code, fontWeight = FontWeight.Bold)
+    }
+}
+

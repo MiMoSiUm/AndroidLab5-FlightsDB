@@ -24,7 +24,7 @@ import kotlin.collections.first
 
 class FlightSearchViewModel(
     savedInstanceHandle: SavedStateHandle,
-    private val airportRepository: AirportRepository,
+    airportRepository: AirportRepository,
     private val favoriteRepository: FavoriteRepository
 ) : ViewModel() {
     private val selected_airport_iata_code: String = checkNotNull(savedInstanceHandle["iata_code"])
@@ -42,31 +42,12 @@ class FlightSearchViewModel(
                 initialValue = FlightSearchUiState()
             )
 
-    fun airportsToFavorite(
-        departureAirport: Airport,
-        destinationAirport: Airport
-    ): StateFlow<Favorite> = favoriteRepository.getFavorite(
-        departure_code = departureAirport.iata_code,
-        destination_code = destinationAirport.iata_code
-    ).filterNotNull()
-        .stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = Favorite(0, "", "")
-    )
-
     fun insertFavorite(destinationAirport: Airport) {
         viewModelScope.launch {
             favoriteRepository.insertFavorite(Favorite(
                 departure_code = selected_airport_iata_code,
                 destination_code = destinationAirport.iata_code
             ))
-        }
-    }
-
-    fun deleteFavorite(favorite: Favorite) {
-        viewModelScope.launch {
-            favoriteRepository.deleteFavorite(favorite)
         }
     }
 

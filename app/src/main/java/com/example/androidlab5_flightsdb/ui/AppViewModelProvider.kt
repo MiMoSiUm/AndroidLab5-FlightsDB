@@ -25,10 +25,7 @@ object AppViewModelProvider {
         }
 
         initializer {
-            FavoritesViewModel(
-                flightSearchApplication().container.airportRepository,
-                flightSearchApplication().container.favoriteRepository
-            )
+            FavoritesViewModel(flightSearchApplication().container.favoriteRepository)
         }
     }
 }

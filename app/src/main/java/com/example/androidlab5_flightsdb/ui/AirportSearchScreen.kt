@@ -45,12 +45,15 @@ fun AirportSearchScreen(
     onAirportClicked: (Airport) -> Unit
 ) {
     val airportSearchUiState = viewModel.airportSearchUiState.collectAsState().value
-    var query = viewModel.currentAirportName.collectAsState().value
+    var query = viewModel.currentAirportName
 
     Column {
         FlightSearchBar(
             query = query,
-            onQueryChange = { viewModel.changeAirportName(it) },
+            onQueryChange = {
+                viewModel.currentAirportName = it
+                viewModel.changeAirportName(it)
+                            },
             searchResults = airportSearchUiState.airportList,
             onCrossPressed = {},
             onAirportClicked = onAirportClicked

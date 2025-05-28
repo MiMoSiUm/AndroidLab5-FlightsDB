@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class FavoritesViewModel(
-    private val airportRepository: AirportRepository,
     private val favoriteRepository: FavoriteRepository
 ): ViewModel() {
     var favoritesUiState: StateFlow<FavoritesUiState> =
@@ -31,19 +30,6 @@ class FavoritesViewModel(
         }
     }
 
-    fun favoriteToAirports(favorite: Favorite): List<StateFlow<Airport>> = listOf(
-        airportRepository.getAirportStream(iata_code = favorite.departure_code).stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = Airport(0, "","", 0)
-        ),
-        airportRepository.getAirportStream(iata_code = favorite.destination_code).stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = Airport(0, "","", 0)
-        ),
-    )
-
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
@@ -51,6 +37,4 @@ class FavoritesViewModel(
 
 data class FavoritesUiState(
     val favoritesList: List<Favorite> = listOf()
-) {
-
-}
+)

@@ -23,8 +23,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,17 +46,10 @@ fun FlightSearchScreen(
 
     LazyColumn(modifier = modifier) {
         items(items = flightSearchUiState.airportList, key = { it.id }) { airport ->
-            val favorite = viewModel.airportsToFavorite(
-                flightSearchUiState.currentAirport!!,
-                airport
-            ).collectAsState().value
             FlightSelectionCard(
-                selectedAirport = flightSearchUiState.currentAirport,
+                selectedAirport = flightSearchUiState.currentAirport!!,
                 currentAirport = airport,
-                isChosen = flightSearchUiState.currentAirport.iata_code == favorite.departure_code &&
-                        airport.iata_code == favorite.destination_code,
-                onSelect = viewModel::insertFavorite,
-                onDeselect = { viewModel.deleteFavorite(favorite) }
+                onSelect = viewModel::insertFavorite
             )
         }
     }
@@ -65,10 +60,9 @@ fun FlightSelectionCard(
     modifier: Modifier = Modifier,
     selectedAirport: Airport,
     currentAirport: Airport,
-    isChosen: Boolean = false,
-    onSelect: (Airport) -> Unit,
-    onDeselect: () -> Unit
+    onSelect: (Airport) -> Unit
 ) {
+    var isChosen by remember { mutableStateOf(false) }
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -95,7 +89,10 @@ fun FlightSelectionCard(
             }
             AnimatedVisibility(visible = !isChosen) {
                 IconButton(
-                    onClick = { onSelect(currentAirport) },
+                    onClick = {
+                        onSelect(currentAirport)
+                        isChosen = !isChosen
+                              },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(imageVector = Icons.Default.Star, contentDescription = null)
@@ -103,7 +100,7 @@ fun FlightSelectionCard(
             }
             AnimatedVisibility(visible = isChosen) {
                 IconButton(
-                    onClick = { onDeselect() },
+                    onClick = {  },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(imageVector = Icons.Default.Star, contentDescription = null, tint = Color.Yellow)
