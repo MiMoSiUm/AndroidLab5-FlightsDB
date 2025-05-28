@@ -14,6 +14,7 @@ import com.example.androidlab5_flightsdb.data.FavoriteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -47,7 +48,8 @@ class FlightSearchViewModel(
     ): StateFlow<Favorite> = favoriteRepository.getFavorite(
         departure_code = departureAirport.iata_code,
         destination_code = destinationAirport.iata_code
-    ).stateIn(
+    ).filterNotNull()
+        .stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
         initialValue = Favorite(0, "", "")

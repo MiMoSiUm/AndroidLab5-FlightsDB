@@ -16,5 +16,5 @@ interface FavoriteDao {
     @Query("SELECT * from favorite")
     fun getAllFavorites(): Flow<List<Favorite>>
     @Query("SELECT * from favorite WHERE departure_code = :departure_code AND destination_code = :destination_code")
-    fun getFavorite(departure_code: String, destination_code: String): Flow<Favorite>
+    fun getFavorite(departure_code: String, destination_code: String): Flow<Favorite?>
 }

@@ -38,10 +38,9 @@ fun FavoritesContent(
         items(items = favoritesUiState.favoritesList, key = { it.id }) { favorite ->
             val airports = viewModel.favoriteToAirports(favorite)
             FavoriteCard(
-                favorite = favorite,
                 selectedAirport = airports[0].collectAsState().value,
                 currentAirport = airports[1].collectAsState().value,
-                onDeselect = viewModel::deleteFavorite
+                onDeselect = { viewModel.deleteFavorite(favorite) }
             )
         }
     }
@@ -50,10 +49,9 @@ fun FavoritesContent(
 @Composable
 fun FavoriteCard(
     modifier: Modifier = Modifier,
-    favorite: Favorite,
     selectedAirport: Airport,
     currentAirport: Airport,
-    onDeselect: (Favorite) -> Unit
+    onDeselect: () -> Unit
 ) {
     Card(
         modifier = modifier
@@ -81,7 +79,7 @@ fun FavoriteCard(
             }
             IconButton(
                 onClick = {
-                    onDeselect(favorite)
+                    onDeselect()
                 },
                 modifier = Modifier.weight(1f)
             ) {

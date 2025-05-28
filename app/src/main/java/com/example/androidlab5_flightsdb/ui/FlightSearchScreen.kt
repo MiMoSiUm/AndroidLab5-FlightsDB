@@ -49,8 +49,10 @@ fun FlightSearchScreen(
                 airport
             ).collectAsState().value
             FlightSelectionCard(
-                selectedAirport = flightSearchUiState.currentAirport!!,
+                selectedAirport = flightSearchUiState.currentAirport,
                 currentAirport = airport,
+                isChosen = flightSearchUiState.currentAirport.iata_code == favorite.departure_code &&
+                        airport.iata_code == favorite.destination_code,
                 onSelect = viewModel::insertFavorite,
                 onDeselect = { viewModel.deleteFavorite(favorite) }
             )
@@ -67,7 +69,6 @@ fun FlightSelectionCard(
     onSelect: (Airport) -> Unit,
     onDeselect: () -> Unit
 ) {
-    var chosenState = remember { mutableStateOf(isChosen) }
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -92,23 +93,17 @@ fun FlightSelectionCard(
                     airport = currentAirport
                 )
             }
-            AnimatedVisibility(visible = !chosenState.value) {
+            AnimatedVisibility(visible = !isChosen) {
                 IconButton(
-                    onClick = {
-                        onSelect(currentAirport)
-                        chosenState.value = !chosenState.value
-                              },
+                    onClick = { onSelect(currentAirport) },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(imageVector = Icons.Default.Star, contentDescription = null)
                 }
             }
-            AnimatedVisibility(visible = chosenState.value) {
+            AnimatedVisibility(visible = isChosen) {
                 IconButton(
-                    onClick = {
-                        onDeselect()
-                        chosenState.value = !chosenState.value
-                              },
+                    onClick = { onDeselect() },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(imageVector = Icons.Default.Star, contentDescription = null, tint = Color.Yellow)
