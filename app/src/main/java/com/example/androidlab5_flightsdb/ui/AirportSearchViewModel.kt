@@ -21,12 +21,20 @@ class AirportSearchViewModel(
     private val airportRepository: AirportRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
-    var currentAirportName: StateFlow<String> =
+//    val _currentAirportName: StateFlow<String> =
+//        userPreferencesRepository.searchQuery.stateIn(
+//            scope = viewModelScope,
+//            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+//            initialValue = ""
+//        )
+    val currentAirportName: StateFlow<String> =
         userPreferencesRepository.searchQuery.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = ""
         )
+
+//    var currentAirportName by mutableStateOf(_currentAirportName.value)
 
     var airportSearchUiState: StateFlow<AirportSearchUiState> =
         airportRepository.getAllAirportsStream(currentAirportName.value).map { AirportSearchUiState(it) }
@@ -48,6 +56,12 @@ class AirportSearchViewModel(
                     )
         }
     }
+
+//    fun savePreference() {
+//        viewModelScope.launch {
+//            userPreferencesRepository.saveQueryPreference(currentAirportName)
+//        }
+//    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

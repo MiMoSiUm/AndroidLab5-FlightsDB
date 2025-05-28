@@ -1,5 +1,6 @@
 package com.example.androidlab5_flightsdb.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -51,6 +52,7 @@ fun AirportSearchScreen(
             query = query,
             onQueryChange = { viewModel.changeAirportName(it) },
             searchResults = airportSearchUiState.airportList,
+            onCrossPressed = {},
             onAirportClicked = onAirportClicked
         )
         FavoritesContent()
@@ -63,12 +65,16 @@ fun FlightSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     searchResults: List<Airport>,
+    onCrossPressed: () -> Unit,
     onAirportClicked: (Airport) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Controls expansion state of the search bar
     var expanded by rememberSaveable { mutableStateOf(false) }
 
+    BackHandler {
+        onCrossPressed()
+    }
     Box(
         modifier
             .fillMaxWidth()
@@ -107,6 +113,7 @@ fun FlightSearchBar(
                         headlineContent = { Text(result.name) },
                         modifier = Modifier
                             .clickable {
+                                onCrossPressed()
                                 onAirportClicked(result)
                                 expanded = false
                             }
